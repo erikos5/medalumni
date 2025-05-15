@@ -1,0 +1,133 @@
+.events-filter {
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  border-radius: 5px;
+}
+
+.events-filter h4 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.events-filter .form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-end;
+}
+
+.events-filter .form-check {
+  display: flex;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.events-filter .form-check input {
+  margin-right: 0.5rem;
+}
+
+.events-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.event-card {
+  display: flex;
+  border-radius: 5px;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.event-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.event-image {
+  flex: 1;
+  max-width: 300px;
+  overflow: hidden;
+}
+
+.event-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.event-details {
+  flex: 2;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.event-details h2 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.event-date, .event-location {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.event-date i, .event-location i {
+  margin-right: 0.5rem;
+  color: var(--primary-color);
+}
+
+.event-details p {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.event-registration {
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.registration-info {
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  color: #666;
+}
+
+/* Dark mode styles */
+.dark-mode .events-filter {
+  background-color: #2a2a2a;
+}
+
+.dark-mode .event-card {
+  background-color: #2a2a2a;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode .event-date, 
+.dark-mode .event-location,
+.dark-mode .registration-info {
+  color: #aaa;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .events-filter .form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .event-card {
+    flex-direction: column;
+  }
+  
+  .event-image {
+    max-width: 100%;
+    height: 200px;
+  }
+} 
