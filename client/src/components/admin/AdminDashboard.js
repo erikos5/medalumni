@@ -1,33 +1,13 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import AuthContext from '../../context/auth/AuthContext';
 import Spinner from '../layout/Spinner';
 import AdminDashboardMenu from '../dashboard/AdminDashboardMenu';
+import api from '../../utils/api';
+import './AdminDashboard.css'; // Import the CSS file
 
-// Mock data for development
-const mockPendingProfiles = [
-  {
-    _id: 'profile1',
-    user: {
-      _id: 'user1',
-      name: 'George Papadopoulos'
-    },
-    school: { name: 'School of Computer Science' },
-    graduationYear: 2022,
-    degree: 'BSc in Computer Science'
-  },
-  {
-    _id: 'profile2',
-    user: {
-      _id: 'user2',
-      name: 'Maria Ioannou'
-    },
-    school: { name: 'School of Business Administration' },
-    graduationYear: 2023,
-    degree: 'BA in Business Administration'
-  }
-];
-
+// Remove mock pending profiles data but keep mockSchools for use in other components
+// Export the mock schools for components that haven't been updated yet
 export const mockSchools = [
   {
     _id: 'school1',
@@ -124,6 +104,43 @@ export const mockSchools = [
 const AdminDashboard = () => {
   const authContext = useContext(AuthContext);
   const { user, loading } = authContext;
+  const [schoolsCount, setSchoolsCount] = useState(0);
+  const [schoolsLoading, setSchoolsLoading] = useState(true);
+  const [pendingProfilesCount, setPendingProfilesCount] = useState(0);
+  const [pendingProfilesLoading, setPendingProfilesLoading] = useState(true);
+
+  useEffect(() => {
+    const getSchoolsCount = async () => {
+      try {
+        const res = await api.get('/api/schools');
+        setSchoolsCount(res.data.length);
+        setSchoolsLoading(false);
+      } catch (err) {
+        console.error('Error getting schools count:', err);
+        // Fallback to mock data if API fails
+        setSchoolsCount(mockSchools.length);
+        setSchoolsLoading(false);
+      }
+    };
+
+    const getPendingProfilesCount = async () => {
+      try {
+        console.log('Fetching pending profiles count...');
+        const res = await api.get('/api/profiles');
+        // Filter profiles with pending status
+        const pendingProfiles = res.data.filter(profile => profile.status === 'pending');
+        console.log(`Found ${pendingProfiles.length} pending profiles`);
+        setPendingProfilesCount(pendingProfiles.length);
+        setPendingProfilesLoading(false);
+      } catch (err) {
+        console.error('Error getting pending profiles count:', err);
+        setPendingProfilesLoading(false);
+      }
+    };
+
+    getSchoolsCount();
+    getPendingProfilesCount();
+  }, []);
 
   if (loading || !user) {
     return <Spinner />;
@@ -147,7 +164,11 @@ const AdminDashboard = () => {
               <i className="fas fa-user-graduate mr-1"></i> Pending Profiles
             </h3>
             <p>Manage alumni profiles waiting for approval</p>
-            <p><small>Pending: {mockPendingProfiles.length} profiles</small></p>
+            <p>
+              <small>
+                Pending: {pendingProfilesLoading ? <Spinner /> : pendingProfilesCount} profiles
+              </small>
+            </p>
             <Link to="/admin/pending-profiles" className="btn btn-primary">
               <i className="fas fa-users"></i> Manage Profiles
             </Link>
@@ -158,7 +179,7 @@ const AdminDashboard = () => {
               <i className="fas fa-university mr-1"></i> School Management
             </h3>
             <p>Add, edit and manage schools and study programs</p>
-            <p><small>Total: {mockSchools.length} schools</small></p>
+            <p><small>Total: {schoolsLoading ? <Spinner /> : schoolsCount} schools</small></p>
             <Link to="/admin/schools" className="btn btn-primary">
               <i className="fas fa-cogs"></i> Manage Schools
             </Link>
