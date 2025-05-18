@@ -24,6 +24,11 @@ const SchoolSchema = new mongoose.Schema({
       }
     }
   ],
+  programs: {
+    undergraduate: [String],
+    postgraduate: [String],
+    professional: [String]
+  },
   date: {
     type: Date,
     default: Date.now

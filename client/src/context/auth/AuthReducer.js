@@ -6,13 +6,19 @@ import {
   LOGIN_SUCCESS,
   LOGIN_FAIL,
   LOGOUT,
-  CLEAR_ERRORS
+  CLEAR_ERRORS,
+  SET_LOADING
 } from '../types';
 
 const authReducer = (state, action) => {
   console.log('AuthReducer: Action dispatched', action.type, action.payload);
   
   switch (action.type) {
+    case SET_LOADING:
+      return {
+        ...state,
+        loading: true
+      };
     case USER_LOADED:
       return {
         ...state,
@@ -21,14 +27,28 @@ const authReducer = (state, action) => {
         user: action.payload
       };
     case REGISTER_SUCCESS:
-    case LOGIN_SUCCESS:
       localStorage.setItem('token', action.payload.token);
-      console.log('LOGIN_SUCCESS: Token saved, isAuthenticated set to true');
+      console.log('REGISTER_SUCCESS: Token saved, loading getUser data');
       return {
         ...state,
         ...action.payload,
         isAuthenticated: true,
-        loading: false,
+        loading: true, // Still loading until user data is retrieved
+        error: null
+      };
+    case LOGIN_SUCCESS:
+      localStorage.setItem('token', action.payload.token);
+      console.log('LOGIN_SUCCESS: Token saved, user data received');
+      // Store the user data as well if it's included in the payload
+      if (action.payload.user) {
+        localStorage.setItem('user', JSON.stringify(action.payload.user));
+      }
+      return {
+        ...state,
+        token: action.payload.token,
+        user: action.payload.user || null,
+        isAuthenticated: true,
+        loading: action.payload.user ? false : true, // Still loading if no user data
         error: null
       };
     case REGISTER_FAIL:
@@ -36,6 +56,7 @@ const authReducer = (state, action) => {
     case LOGIN_FAIL:
     case LOGOUT:
       localStorage.removeItem('token');
+      localStorage.removeItem('user');
       console.log('AUTH_ERROR/LOGOUT: Token removed, isAuthenticated set to false');
       return {
         ...state,

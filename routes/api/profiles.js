@@ -7,7 +7,6 @@ const registeredOrApplied = require('../../middleware/registeredOrApplied');
 const Profile = require('../../models/Profile');
 const User = require('../../models/User');
 const School = require('../../models/School');
-const { profiles: mockProfiles } = require('../../config/mockData');
 const mongoose = require('mongoose');
 
 // @route   GET api/profiles/me
@@ -15,20 +14,6 @@ const mongoose = require('mongoose');
 // @access  Private
 router.get('/me', auth, async (req, res) => {
   try {
-    // Check if MongoDB is connected
-    if (mongoose.connection.readyState !== 1) {
-      console.log('Using mock profile data');
-      const mockProfile = mockProfiles.find(
-        profile => profile.user._id === req.user.id
-      );
-      
-      if (!mockProfile) {
-        return res.status(400).json({ msg: 'There is no profile for this user' });
-      }
-      
-      return res.json(mockProfile);
-    }
-    
     const profile = await Profile.findOne({ user: req.user.id })
       .populate('user', ['name', 'email'])
       .populate('school', ['name']);
@@ -39,8 +24,8 @@ router.get('/me', auth, async (req, res) => {
 
     res.json(profile);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
+    console.error('Error fetching profile:', err.message);
+    res.status(500).json({ msg: 'Server Error' });
   }
 });
 
@@ -133,12 +118,6 @@ router.post(
 // @access  Public
 router.get('/', async (req, res) => {
   try {
-    // Check if MongoDB is connected
-    if (mongoose.connection.readyState !== 1) {
-      console.log('Using mock profiles data');
-      return res.json(mockProfiles);
-    }
-    
     const profiles = await Profile.find()
       .populate('user', ['name', 'email'])
       .populate('school', ['name'])
@@ -146,10 +125,8 @@ router.get('/', async (req, res) => {
 
     res.json(profiles);
   } catch (err) {
-    console.error(err.message);
-    // Fallback to mock data
-    console.log('Error fetching from DB, using mock profiles data');
-    return res.json(mockProfiles);
+    console.error('Error fetching profiles from database:', err.message);
+    res.status(500).json({ msg: 'Server Error' });
   }
 });
 
@@ -158,20 +135,6 @@ router.get('/', async (req, res) => {
 // @access  Public
 router.get('/user/:user_id', async (req, res) => {
   try {
-    // Check if MongoDB is connected
-    if (mongoose.connection.readyState !== 1) {
-      console.log('Using mock profile data');
-      const mockProfile = mockProfiles.find(
-        profile => profile.user._id === req.params.user_id
-      );
-      
-      if (!mockProfile) {
-        return res.status(400).json({ msg: 'Profile not found' });
-      }
-      
-      return res.json(mockProfile);
-    }
-    
     const profile = await Profile.findOne({ user: req.params.user_id })
       .populate('user', ['name', 'email'])
       .populate('school', ['name']);
@@ -182,22 +145,13 @@ router.get('/user/:user_id', async (req, res) => {
 
     res.json(profile);
   } catch (err) {
-    console.error(err.message);
-    
-    // Fallback to mock data
-    const mockProfile = mockProfiles.find(
-      profile => profile.user._id === req.params.user_id
-    );
-    
-    if (mockProfile) {
-      return res.json(mockProfile);
-    }
+    console.error('Error fetching profile by user ID:', err.message);
     
     if (err.kind == 'ObjectId') {
       return res.status(400).json({ msg: 'Profile not found' });
     }
     
-    res.status(500).send('Server Error');
+    res.status(500).json({ msg: 'Server Error' });
   }
 });
 

@@ -4,7 +4,6 @@ const { check, validationResult } = require('express-validator');
 const auth = require('../../middleware/auth');
 const isAdmin = require('../../middleware/isAdmin');
 const School = require('../../models/School');
-const { schools: mockSchools } = require('../../config/mockData');
 const mongoose = require('mongoose');
 
 // @route   GET api/schools
@@ -12,19 +11,12 @@ const mongoose = require('mongoose');
 // @access  Public
 router.get('/', async (req, res) => {
   try {
-    // Check if MongoDB is connected
-    if (mongoose.connection.readyState !== 1) {
-      console.log('Using mock schools data');
-      return res.json(mockSchools);
-    }
-    
+    // Only use real data from MongoDB
     const schools = await School.find().sort({ name: 1 });
     res.json(schools);
   } catch (err) {
-    console.error(err.message);
-    // Fallback to mock data
-    console.log('Error fetching from DB, using mock schools data');
-    return res.json(mockSchools);
+    console.error('Error fetching schools from database:', err.message);
+    res.status(500).json({ msg: 'Server Error' });
   }
 });
 
@@ -33,16 +25,6 @@ router.get('/', async (req, res) => {
 // @access  Public
 router.get('/:id', async (req, res) => {
   try {
-    // Check if MongoDB is connected
-    if (mongoose.connection.readyState !== 1) {
-      console.log('Using mock school data');
-      const mockSchool = mockSchools.find(school => school._id === req.params.id);
-      if (!mockSchool) {
-        return res.status(404).json({ msg: 'School not found' });
-      }
-      return res.json(mockSchool);
-    }
-    
     const school = await School.findById(req.params.id);
 
     if (!school) {
@@ -51,13 +33,7 @@ router.get('/:id', async (req, res) => {
 
     res.json(school);
   } catch (err) {
-    console.error(err.message);
-    
-    // Fallback to mock data
-    const mockSchool = mockSchools.find(school => school._id === req.params.id);
-    if (mockSchool) {
-      return res.json(mockSchool);
-    }
+    console.error('Error fetching school by ID:', err.message);
     
     if (err.kind === 'ObjectId') {
       return res.status(404).json({ msg: 'School not found' });
@@ -86,7 +62,7 @@ router.post(
     }
 
     try {
-      const { name, description, image, departments } = req.body;
+      const { name, description, image, departments, programs } = req.body;
 
       // Check if school already exists
       let school = await School.findOne({ name });
@@ -100,7 +76,12 @@ router.post(
         name,
         description,
         image,
-        departments: departments || []
+        departments: departments || [],
+        programs: programs || {
+          undergraduate: [],
+          postgraduate: [],
+          professional: []
+        }
       });
 
       await school.save();
@@ -133,7 +114,7 @@ router.put(
     }
 
     try {
-      const { name, description, image, departments } = req.body;
+      const { name, description, image, departments, programs } = req.body;
 
       // Check if school exists
       let school = await School.findById(req.params.id);
@@ -150,7 +131,8 @@ router.put(
             name,
             description,
             image,
-            departments: departments || school.departments
+            departments: departments || school.departments,
+            programs: programs || school.programs
           }
         },
         { new: true }
@@ -179,8 +161,8 @@ router.delete('/:id', [auth, isAdmin], async (req, res) => {
       return res.status(404).json({ msg: 'School not found' });
     }
 
-    // Delete school
-    await school.remove();
+    // Delete school using findByIdAndDelete instead of remove
+    await School.findByIdAndDelete(req.params.id);
 
     res.json({ msg: 'School removed' });
   } catch (err) {
