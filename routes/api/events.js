@@ -5,7 +5,6 @@ const auth = require('../../middleware/auth');
 const isAdmin = require('../../middleware/isAdmin');
 const Event = require('../../models/Event');
 const User = require('../../models/User');
-const { events: mockEvents } = require('../../config/mockData');
 const mongoose = require('mongoose');
 
 // @route   GET api/events
@@ -13,19 +12,12 @@ const mongoose = require('mongoose');
 // @access  Public
 router.get('/', async (req, res) => {
   try {
-    // Check if MongoDB is connected
-    if (mongoose.connection.readyState !== 1) {
-      console.log('Using mock events data');
-      return res.json(mockEvents);
-    }
-    
+    // Only use real data from MongoDB
     const events = await Event.find().sort({ date: 1 });
     res.json(events);
   } catch (err) {
-    console.error(err.message);
-    // Fallback to mock data
-    console.log('Error fetching from DB, using mock events data');
-    return res.json(mockEvents);
+    console.error('Error fetching events from database:', err.message);
+    res.status(500).json({ msg: 'Server Error' });
   }
 });
 
@@ -34,20 +26,6 @@ router.get('/', async (req, res) => {
 // @access  Public
 router.get('/:id', async (req, res) => {
   try {
-    // Check if MongoDB is connected
-    if (mongoose.connection.readyState !== 1) {
-      console.log('Using mock event data');
-      const mockEvent = mockEvents.find(
-        event => event._id === req.params.id
-      );
-      
-      if (!mockEvent) {
-        return res.status(404).json({ msg: 'Event not found' });
-      }
-      
-      return res.json(mockEvent);
-    }
-    
     const event = await Event.findById(req.params.id);
     
     if (!event) {
@@ -56,16 +34,7 @@ router.get('/:id', async (req, res) => {
     
     res.json(event);
   } catch (err) {
-    console.error(err.message);
-    
-    // Fallback to mock data
-    const mockEvent = mockEvents.find(
-      event => event._id === req.params.id
-    );
-    
-    if (mockEvent) {
-      return res.json(mockEvent);
-    }
+    console.error('Error fetching event by ID:', err.message);
     
     if (err.kind === 'ObjectId') {
       return res.status(404).json({ msg: 'Event not found' });
@@ -93,6 +62,10 @@ router.post(
     ]
   ],
   async (req, res) => {
+    console.log('Event creation endpoint hit');
+    console.log('User in request:', req.user);
+    console.log('Request body:', req.body);
+    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       console.log('Validation errors in event creation:', errors.array());
@@ -116,8 +89,9 @@ router.post(
         createdBy: req.user.id
       });
 
+      console.log('Created new event model:', newEvent);
       const event = await newEvent.save();
-      console.log('Event created successfully:', event._id);
+      console.log('Event saved to database with ID:', event._id);
       res.json(event);
     } catch (err) {
       console.error('Error creating event:', err.message);
@@ -183,23 +157,24 @@ router.put('/:id', [auth, isAdmin], async (req, res) => {
 // @access  Private/Admin
 router.delete('/:id', [auth, isAdmin], async (req, res) => {
   try {
-    const event = await Event.findById(req.params.id);
+    console.log('Attempting to delete event with ID:', req.params.id);
+    
+    const event = await Event.findByIdAndDelete(req.params.id);
     
     if (!event) {
       return res.status(404).json({ msg: 'Event not found' });
     }
     
-    await event.remove();
-    
-    res.json({ msg: 'Event removed' });
+    console.log('Event successfully deleted:', req.params.id);
+    res.json({ msg: 'Event removed', id: req.params.id });
   } catch (err) {
-    console.error(err.message);
+    console.error('Error deleting event:', err.message);
     
     if (err.kind === 'ObjectId') {
       return res.status(404).json({ msg: 'Event not found' });
     }
     
-    res.status(500).send('Server Error');
+    res.status(500).json({ msg: 'Server Error', error: err.message });
   }
 });
 

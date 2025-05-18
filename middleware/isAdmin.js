@@ -1,37 +1,26 @@
 const User = require('../models/User');
-const { users: mockUsers } = require('../config/mockData');
 const mongoose = require('mongoose');
 
 module.exports = async function(req, res, next) {
   try {
-    console.log('isAdmin middleware - User data:', req.user);
+    console.log('isAdmin middleware - User data:', JSON.stringify(req.user));
     
-    // Special handling for hardcoded admin user
-    if (req.user.id === 'admin-user-id' || req.user.email === 'admin@example.com' || req.user.role === 'admin') {
-      console.log('Admin access granted: admin user identified');
-      return next();
+    // For all MongoDB operations, make sure to be tolerant of MongoDB ObjectId / string ID format differences
+    let userId = req.user.id || req.user._id;
+    console.log('Looking up admin status for user ID:', userId);
+    
+    // Convert userId to string if it's not already
+    if (userId && typeof userId !== 'string') {
+      userId = String(userId);
     }
     
-    // Check if using mock data
-    if (mongoose.connection.readyState !== 1) {
-      console.log('Using mock data for admin check');
-      const mockUser = mockUsers.find(user => user._id === req.user.id);
-      if (!mockUser) {
-        console.log('Admin access denied: mock user not found');
-        return res.status(404).json({ msg: 'User not found' });
-      }
-      
-      if (mockUser.role !== 'admin') {
-        console.log('Admin access denied: mock user is not admin');
-        return res.status(403).json({ msg: 'Access denied. Admin access required' });
-      }
-      
-      console.log('Admin access granted: mock admin user');
-      return next();
-    }
+    console.log('Checking database for admin user with ID:', userId);
     
-    console.log('Checking database for admin user with ID:', req.user.id);
-    const user = await User.findById(req.user.id);
+    // Find user by ID
+    let user = await User.findById(userId).catch(err => {
+      console.log('Error finding user by ID:', err.message);
+      return null;
+    });
 
     // Check if user exists
     if (!user) {
@@ -49,6 +38,10 @@ module.exports = async function(req, res, next) {
     next();
   } catch (err) {
     console.error('Admin middleware error:', err.message);
-    res.status(500).send('Server Error');
+    console.error(err.stack);
+    res.status(500).json({
+      msg: 'Server Error',
+      error: err.message
+    });
   }
 }; 
