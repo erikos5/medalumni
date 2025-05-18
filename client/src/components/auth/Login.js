@@ -58,6 +58,19 @@ const Login = () => {
     }, 100);
   };
 
+  // User login shortcut
+  const handleUserLogin = (e) => {
+    e.preventDefault();
+    setUser({
+      email: 'yannos@example.com',
+      password: 'password123'
+    });
+    // Submit the form after a short delay to allow state update
+    setTimeout(() => {
+      document.querySelector('form.fancy-form').dispatchEvent(new Event('submit', { cancelable: true }));
+    }, 100);
+  };
+
   return (
     <section className="fancy-auth-page">
       <div className="fancy-overlay"></div>
@@ -116,7 +129,13 @@ const Login = () => {
 
         <div className="demo-credentials fancy-alert">
           <i className="fas fa-info-circle"></i>
-          <span><strong>Demo Credentials:</strong> <button onClick={handleAdminLogin}>admin@example.com / password123</button></span>
+          <div className="demo-buttons">
+            <div><strong>Demo Credentials:</strong></div>
+            <div>
+              <button onClick={handleAdminLogin} className="demo-btn">Admin: admin@example.com / password123</button>
+              <button onClick={handleUserLogin} className="demo-btn">User: yannos@example.com / password123</button>
+            </div>
+          </div>
         </div>
       </div>
     </section>
