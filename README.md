@@ -74,9 +74,10 @@ cd ..
    
    Example of a completed `.env` file:
    ```
-   NODE_ENV=development
-   JWT_SECRET=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9qwertyuiop12345
-   PORT=5006
+    NODE_ENV=development
+    PORT=5006
+    MONGO_URI=mongodb://localhost:27017/mediterranean-alumni
+    JWT_SECRET=mysecrettoken
    ```
    - The JWT_SECRET is used for securing authentication tokens
    - You can generate a secure random string for JWT_SECRET using a tool like https://randomkeygen.com/
