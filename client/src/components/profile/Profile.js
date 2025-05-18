@@ -31,10 +31,10 @@ const Profile = () => {
   if (!profile) {
     return (
       <div className="container">
-        <h1 className="large text-primary">Προφίλ</h1>
-        <p>Δεν βρέθηκε προφίλ για αυτόν τον χρήστη.</p>
+        <h1 className="large text-primary">Profile</h1>
+        <p>No profile found for this user.</p>
         <Link to="/profiles" className="btn">
-          Επιστροφή στα Προφίλ
+          Back to Profiles
         </Link>
       </div>
     );
@@ -43,7 +43,7 @@ const Profile = () => {
   return (
     <div className="container">
       <Link to="/profiles" className="btn">
-        Επιστροφή στα Προφίλ
+        Back to Profiles
       </Link>
 
       <div className="profile-grid my-1">
@@ -55,7 +55,7 @@ const Profile = () => {
           )}
           <h1 className="large">{profile.user.name}</h1>
           <p className="lead">
-            {profile.currentPosition} {profile.company && `στην ${profile.company}`}
+            {profile.currentPosition} {profile.company && `at ${profile.company}`}
           </p>
           <p>{profile.location && <span>{profile.location}</span>}</p>
           <div className="icons my-1">
@@ -90,29 +90,29 @@ const Profile = () => {
         <div className="profile-about bg-light p-2">
           {profile.bio && (
             <>
-              <h2 className="text-primary">Σχετικά με {profile.user.name.split(' ')[0]}</h2>
+              <h2 className="text-primary">About {profile.user.name.split(' ')[0]}</h2>
               <p>{profile.bio}</p>
               <div className="line"></div>
             </>
           )}
           
-          <h2 className="text-primary">Ακαδημαϊκές Πληροφορίες</h2>
+          <h2 className="text-primary">Academic Information</h2>
           <div className="academics">
             <div>
-              <strong>Σχολή:</strong> {profile.school.name}
+              <strong>School:</strong> {profile.school.name}
             </div>
             <div>
-              <strong>Πτυχίο:</strong> {profile.degree}
+              <strong>Degree:</strong> {profile.degree}
             </div>
             <div>
-              <strong>Έτος Αποφοίτησης:</strong> {profile.graduationYear}
+              <strong>Graduation Year:</strong> {profile.graduationYear}
             </div>
           </div>
 
           {profile.skills.length > 0 && (
             <>
               <div className="line"></div>
-              <h2 className="text-primary">Δεξιότητες</h2>
+              <h2 className="text-primary">Skills</h2>
               <div className="skills">
                 {profile.skills.map((skill, index) => (
                   <div key={index} className="p-1">

@@ -57,7 +57,7 @@ const ProfileForm = () => {
         const res = await api.get('/api/schools');
         setSchools(res.data);
       } catch (err) {
-        setAlert('Σφάλμα κατά τη φόρτωση των σχολών', 'danger');
+        setAlert('Error loading schools', 'danger');
       }
     };
 
@@ -84,10 +84,10 @@ const ProfileForm = () => {
         });
       } catch (err) {
         if (err.response && err.response.status === 400) {
-          // Δεν υπάρχει προφίλ
+          // No profile exists
           setProfile(null);
         } else {
-          setAlert('Σφάλμα κατά τη φόρτωση του προφίλ', 'danger');
+          setAlert('Error loading profile', 'danger');
         }
       }
       setIsLoading(false);
@@ -104,13 +104,13 @@ const ProfileForm = () => {
     e.preventDefault();
     try {
       await api.post('/api/profiles', formData);
-      setAlert('Το προφίλ ενημερώθηκε επιτυχώς', 'success');
+      setAlert('Profile updated successfully', 'success');
       if (!profile) {
-        // Αν είναι νέο προφίλ, ανακατεύθυνση στο dashboard
+        // If it's a new profile, redirect to dashboard
         navigate('/dashboard');
       }
     } catch (err) {
-      setAlert('Σφάλμα κατά την αποθήκευση του προφίλ', 'danger');
+      setAlert('Error saving profile', 'danger');
     }
   };
 
@@ -121,15 +121,15 @@ const ProfileForm = () => {
   return (
     <div className="container">
       <h1 className="large text-primary">
-        {profile ? 'Επεξεργασία Προφίλ' : 'Δημιουργία Προφίλ'}
+        {profile ? 'Edit Profile' : 'Create Profile'}
       </h1>
       <p className="lead">
         <i className="fas fa-user"></i>{' '}
         {profile
-          ? 'Ενημερώστε τις πληροφορίες του προφίλ σας'
-          : 'Προσθέστε πληροφορίες για το προφίλ σας'}
+          ? 'Update your profile information'
+          : 'Add information to your profile'}
       </p>
-      <small>* = απαιτούμενο πεδίο</small>
+      <small>* = required field</small>
       <form className="form" onSubmit={onSubmit}>
         <div className="form-group">
           <select
@@ -138,7 +138,7 @@ const ProfileForm = () => {
             onChange={onChange}
             required
           >
-            <option value="">* Επιλέξτε Σχολή</option>
+            <option value="">* Select School</option>
             {schools.map(s => (
               <option key={s._id} value={s._id}>
                 {s.name}
@@ -150,7 +150,7 @@ const ProfileForm = () => {
         <div className="form-group">
           <input
             type="number"
-            placeholder="* Έτος Αποφοίτησης"
+            placeholder="* Graduation Year"
             name="graduationYear"
             value={graduationYear}
             onChange={onChange}
@@ -163,7 +163,7 @@ const ProfileForm = () => {
         <div className="form-group">
           <input
             type="text"
-            placeholder="* Πτυχίο"
+            placeholder="* Degree"
             name="degree"
             value={degree}
             onChange={onChange}
@@ -173,84 +173,84 @@ const ProfileForm = () => {
 
         <div className="form-group">
           <textarea
-            placeholder="Σύντομη Βιογραφία"
+            placeholder="Short Biography"
             name="bio"
             value={bio}
             onChange={onChange}
           ></textarea>
-          <small className="form-text">Λίγα λόγια για εσάς</small>
+          <small className="form-text">Tell us about yourself</small>
         </div>
 
         <div className="form-group">
           <input
             type="text"
-            placeholder="Τοποθεσία"
+            placeholder="Location"
             name="location"
             value={location}
             onChange={onChange}
           />
           <small className="form-text">
-            Πόλη & Χώρα (π.χ. Αθήνα, Ελλάδα)
+            City & Country (e.g. Athens, Greece)
           </small>
         </div>
 
         <div className="form-group">
           <input
             type="text"
-            placeholder="Τρέχουσα Θέση"
+            placeholder="Current Position"
             name="currentPosition"
             value={currentPosition}
             onChange={onChange}
           />
-          <small className="form-text">Η επαγγελματική σας θέση</small>
+          <small className="form-text">Your professional position</small>
         </div>
 
         <div className="form-group">
           <input
             type="text"
-            placeholder="Εταιρεία"
+            placeholder="Company"
             name="company"
             value={company}
             onChange={onChange}
           />
-          <small className="form-text">Η εταιρεία στην οποία εργάζεστε</small>
+          <small className="form-text">The company you work for</small>
         </div>
 
         <div className="form-group">
           <input
             type="text"
-            placeholder="Ιστοσελίδα"
+            placeholder="Website"
             name="website"
             value={website}
             onChange={onChange}
           />
           <small className="form-text">
-            Η προσωπική σας ιστοσελίδα ή της εταιρείας σας
+            Your personal website or your company's website
           </small>
         </div>
 
         <div className="form-group">
           <input
             type="text"
-            placeholder="Δεξιότητες"
+            placeholder="Skills"
             name="skills"
             value={skills}
             onChange={onChange}
           />
           <small className="form-text">
-            Χρησιμοποιήστε κόμματα για να διαχωρίσετε τις δεξιότητές σας (π.χ. HTML, CSS, JavaScript)
+            Use commas to separate your skills (e.g. HTML, CSS, JavaScript)
           </small>
         </div>
 
         <div className="form-group">
           <input
             type="text"
-            placeholder="Εικόνα Προφίλ (URL)"
+            placeholder="Profile Image (URL)"
             name="profileImage"
             value={profileImage}
             onChange={onChange}
           />
-          <small className="form-text">URL για την εικόνα του προφίλ σας</small>
+          <small className="form-text">URL for your profile image</small>
         </div>
 
         <div className="form-group">
@@ -293,9 +293,9 @@ const ProfileForm = () => {
           />
         </div>
 
-        <input type="submit" className="btn btn-primary my-1" value="Αποθήκευση" />
+        <input type="submit" className="btn btn-primary my-1" value="Save" />
         <Link className="btn btn-light my-1" to="/dashboard">
-          Πίσω
+          Back
         </Link>
       </form>
     </div>
