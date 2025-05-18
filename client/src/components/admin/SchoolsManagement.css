@@ -11,12 +11,13 @@
   min-width: 300px;
 }
 
+/* Make add-school-form properly dark with visible text */
 .add-school-form {
-  background-color: var(--dark-color);
-  color: var(--light-color);
+  background-color: #1e1e1e !important; /* Darker background */
+  color: white !important; /* White text for better visibility */
   padding: 1.5rem;
   border-radius: 5px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 .add-school-form h3 {
@@ -28,10 +29,10 @@
 .add-school-form textarea {
   width: 100%;
   padding: 0.8rem;
-  border: 1px solid var(--dark-color);
+  border: 1px solid #444;
   border-radius: 4px;
-  background-color: var(--dark-bg-color);
-  color: var(--light-color);
+  background-color: #333 !important; /* Darker input background */
+  color: white !important; /* White text in inputs */
   margin-bottom: 0.5rem;
 }
 
@@ -39,6 +40,12 @@
 .add-school-form textarea:focus {
   border-color: var(--primary-color);
   outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* Add a specific override for labels to ensure they're white */
+.add-school-form label {
+  color: white !important;
 }
 
 .programs-section {
@@ -57,7 +64,7 @@
 .program-form label {
   display: block;
   margin-bottom: 0.5rem;
-  color: var(--light-color);
+  color: white !important;
 }
 
 .program-input-group {
@@ -78,11 +85,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: var(--dark-bg-color);
+  background-color: #333 !important;
   padding: 0.5rem;
   margin-bottom: 0.5rem;
   border-radius: 4px;
-  color: var(--light-color);
+  color: white !important;
 }
 
 .btn-sm {
@@ -105,8 +112,8 @@
 
 /* School cards in the list */
 .school {
-  background-color: var(--dark-color) !important;
-  color: var(--light-color) !important;
+  background-color: #1e1e1e !important;
+  color: white !important;
   border-radius: 5px;
   padding: 1.5rem !important;
   margin-bottom: 1.5rem;
@@ -114,6 +121,10 @@
 
 .school h4 {
   color: var(--primary-color);
+}
+
+.school p {
+  color: white !important;
 }
 
 .programs-container {
@@ -131,7 +142,11 @@
 
 .program-category ul {
   padding-left: 1.5rem;
-  color: var(--light-color);
+  color: white !important;
+}
+
+.program-category ul li {
+  color: white !important;
 }
 
 .school-actions {
@@ -140,17 +155,23 @@
   gap: 0.5rem;
 }
 
-/* Make sure text is visible in dark mode */
+/* General overrides for dark mode */
 .bg-light {
-  background-color: var(--dark-color) !important;
-  color: var(--light-color) !important;
+  background-color: #1e1e1e !important;
+  color: white !important;
 }
 
 .text-dark {
-  color: var(--light-color) !important;
+  color: white !important;
 }
 
-/* Fix input placeholder color */
+/* Fix input placeholder color for better visibility */
 ::placeholder {
-  color: #999;
+  color: #bbb !important;
+  opacity: 0.7;
+}
+
+/* Make sure small texts and all other elements have good contrast */
+.form-text, small, .text-muted {
+  color: #ddd !important;
 } 
