@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const { schools, users, profiles, events } = require('../config/mockData');
+// const { schools, users, profiles, events } = require('../config/mockData'); // Mock data no longer used
 const School = require('../models/School');
 const User = require('../models/User');
 const Profile = require('../models/Profile');
@@ -8,6 +8,22 @@ const Event = require('../models/Event');
 
 // Load environment variables
 dotenv.config();
+
+console.log('\n⚠️  DEPRECATED: This seed script is no longer recommended for use ⚠️');
+console.log('The application now uses real user data and the mock data has been removed.');
+console.log('Using this script would reintroduce mock data which has been intentionally removed.');
+console.log('If you need to add test data, consider creating real users and profiles instead.\n');
+
+console.log('To add a new admin user, use:');
+console.log('  node scripts/create-admin-user.js\n');
+
+console.log('To add pending profiles, use:');
+console.log('  node scripts/create-pending-profiles.js\n');
+
+console.log('To approve pending profiles, use:');
+console.log('  node scripts/approve-pending-profiles.js\n');
+
+process.exit(0);
 
 // Connect to MongoDB
 const connectDB = async () => {
