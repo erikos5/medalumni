@@ -25,14 +25,21 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   response => response,
   error => {
-    if (error.response && error.response.status === 401) {
-      // If we get a 401 (Unauthorized), clear localStorage and reload
-      if (localStorage.getItem('token')) {
-        console.error('Auth token expired or invalid, logging out');
-        localStorage.removeItem('token');
-        localStorage.removeItem('adminSession');
+    // Only handle specific authentication errors
+    if (error.response && 
+        error.response.status === 401 && 
+        (error.response.data.msg === 'Token is not valid' || 
+         error.response.data.msg === 'Token has expired')) {
+      
+      console.error('Auth token expired or invalid, logging out');
+      localStorage.removeItem('token');
+      localStorage.removeItem('adminSession');
+      
+      // Use window.location for logout instead of immediate redirect
+      // This gives time for the current operation to complete
+      setTimeout(() => {
         window.location.href = '/login';
-      }
+      }, 100);
     }
     return Promise.reject(error);
   }
