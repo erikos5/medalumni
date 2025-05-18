@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import AuthContext from '../../context/auth/AuthContext';
 import AlertContext from '../../context/alert/AlertContext';
 import Spinner from '../layout/Spinner';
-import { mockSchools } from './AdminDashboard';
+import api from '../../utils/api';
 
 const SchoolsManagement = () => {
   const authContext = useContext(AuthContext);
@@ -22,6 +22,9 @@ const SchoolsManagement = () => {
       professional: []
     }
   });
+  const [editMode, setEditMode] = useState(false);
+  const [currentSchoolId, setCurrentSchoolId] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { name, description, image, programs } = schoolForm;
   const [programInput, setProgramInput] = useState({
@@ -32,14 +35,29 @@ const SchoolsManagement = () => {
 
   const loadSchools = async () => {
     try {
-      // For development, load mock data
-      setSchools(mockSchools);
+      setIsSubmitting(true);
+      // Use real data from the database
+      const res = await api.get('/api/schools');
       
-      // When backend is available:
-      // const res = await api.get('/api/schools');
-      // setSchools(res.data);
+      // Transform the data to match the expected structure
+      const transformedSchools = res.data.map(school => {
+        // If the school doesn't have programs property, create it
+        if (!school.programs) {
+          school.programs = {
+            undergraduate: [],
+            postgraduate: [],
+            professional: []
+          };
+        }
+        return school;
+      });
+      
+      setSchools(transformedSchools);
+      setIsSubmitting(false);
     } catch (err) {
+      console.error('Error loading schools:', err);
       setAlert('Error loading schools', 'danger');
+      setIsSubmitting(false);
     }
   };
 
@@ -88,40 +106,100 @@ const SchoolsManagement = () => {
     });
   };
 
+  const resetForm = () => {
+    setSchoolForm({
+      name: '',
+      description: '',
+      image: '',
+      programs: {
+        undergraduate: [],
+        postgraduate: [],
+        professional: []
+      }
+    });
+    setProgramInput({
+      undergraduate: '',
+      postgraduate: '',
+      professional: ''
+    });
+    setEditMode(false);
+    setCurrentSchoolId(null);
+  };
+
+  const startEditMode = (school) => {
+    setEditMode(true);
+    setCurrentSchoolId(school._id);
+    
+    // Set the form values with the current school data
+    setSchoolForm({
+      name: school.name,
+      description: school.description,
+      image: school.image || '',
+      programs: {
+        undergraduate: school.programs?.undergraduate || [],
+        postgraduate: school.programs?.postgraduate || [],
+        professional: school.programs?.professional || []
+      }
+    });
+    
+    // Scroll to the form
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
+  const handleDeleteSchool = async (schoolId) => {
+    if (window.confirm('Are you sure you want to delete this school?')) {
+      try {
+        setIsSubmitting(true);
+        await api.delete(`/api/schools/${schoolId}`);
+        
+        // Update the state by removing the deleted school
+        setSchools(schools.filter(school => school._id !== schoolId));
+        setAlert('School deleted successfully', 'success');
+        setIsSubmitting(false);
+      } catch (err) {
+        console.error('Error deleting school:', err);
+        setAlert('Error deleting school', 'danger');
+        setIsSubmitting(false);
+      }
+    }
+  };
+
   const onSubmit = async e => {
     e.preventDefault();
     try {
-      // For development, just add to local state
-      const newSchool = {
-        _id: `school${Date.now()}`,
-        ...schoolForm
-      };
+      setIsSubmitting(true);
       
-      setSchools([...schools, newSchool]);
-      setAlert('School added successfully', 'success');
-      
-      // When backend is available:
-      // await api.post('/api/schools', schoolForm);
-      // loadSchools();
-      
-      setSchoolForm({
-        name: '',
-        description: '',
-        image: '',
-        programs: {
-          undergraduate: [],
-          postgraduate: [],
-          professional: []
-        }
-      });
-      
-      setProgramInput({
-        undergraduate: '',
-        postgraduate: '',
-        professional: ''
-      });
+      if (editMode) {
+        // Update existing school
+        const res = await api.put(`/api/schools/${currentSchoolId}`, schoolForm);
+        
+        // Update the schools state with the updated school
+        setSchools(
+          schools.map(school => (school._id === currentSchoolId ? res.data : school))
+        );
+        
+        setAlert('School updated successfully', 'success');
+        resetForm();
+      } else {
+        // Create new school
+        const res = await api.post('/api/schools', schoolForm);
+        
+        // Add the new school to the schools state
+        setSchools([...schools, res.data]);
+        setAlert('School added successfully', 'success');
+        resetForm();
+      }
+      setIsSubmitting(false);
     } catch (err) {
-      setAlert('Error adding school', 'danger');
+      console.error('Error saving school:', err);
+      setAlert(
+        err.response?.data?.msg || 'Error saving school',
+        'danger'
+      );
+      setIsSubmitting(false);
     }
   };
 
@@ -148,7 +226,7 @@ const SchoolsManagement = () => {
       <div className="admin-section my-2">
         <div className="schools-container">
           <div className="add-school-form">
-            <h3>Add New School</h3>
+            <h3>{editMode ? 'Edit School' : 'Add New School'}</h3>
             <form onSubmit={onSubmit}>
               <div className="form-group">
                 <input
@@ -297,12 +375,32 @@ const SchoolsManagement = () => {
                 </div>
               </div>
               
-              <input type="submit" className="btn btn-primary" value="Add School" />
+              <div className="form-actions">
+                <input 
+                  type="submit" 
+                  className="btn btn-primary" 
+                  value={editMode ? 'Update School' : 'Add School'}
+                  disabled={isSubmitting} 
+                />
+                
+                {editMode && (
+                  <button
+                    type="button"
+                    className="btn btn-light ml-2"
+                    onClick={resetForm}
+                    disabled={isSubmitting}
+                  >
+                    Cancel
+                  </button>
+                )}
+              </div>
             </form>
           </div>
           <div className="schools-list">
             <h3>Existing Schools</h3>
-            {schools.length === 0 ? (
+            {isSubmitting ? (
+              <Spinner />
+            ) : schools.length === 0 ? (
               <p>No schools have been added yet.</p>
             ) : (
               schools.map(school => (
@@ -348,8 +446,19 @@ const SchoolsManagement = () => {
                   )}
                   
                   <div className="school-actions">
-                    <button className="btn btn-dark">
+                    <button 
+                      className="btn btn-dark" 
+                      onClick={() => startEditMode(school)}
+                      disabled={isSubmitting}
+                    >
                       <i className="fas fa-edit"></i> Edit
+                    </button>
+                    <button 
+                      className="btn btn-danger ml-2"
+                      onClick={() => handleDeleteSchool(school._id)}
+                      disabled={isSubmitting}
+                    >
+                      <i className="fas fa-trash"></i> Delete
                     </button>
                   </div>
                 </div>

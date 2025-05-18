@@ -20,6 +20,7 @@ import PhotoManagement from './components/admin/PhotoManagement';
 import EventsManagement from './components/admin/EventsManagement';
 import PrivateRoute from './components/routing/PrivateRoute';
 import AdminRoute from './components/routing/AdminRoute';
+import AuthRoute from './components/routing/AuthRoute';
 import Alert from './components/layout/Alert';
 
 // Context
@@ -44,11 +45,23 @@ const App = () => {
                 <Route path="/" element={<Landing />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
-                <Route path="/profiles" element={<Profiles />} />
+                <Route 
+                  path="/profiles" 
+                  element={<AuthRoute component={Profiles} />} 
+                />
                 <Route path="/programs" element={<ProgramsList />} />
-                <Route path="/events" element={<EventsList />} />
-                <Route path="/gallery" element={<Gallery />} />
-                <Route path="/profile/:id" element={<Profile />} />
+                <Route 
+                  path="/events" 
+                  element={<AuthRoute component={EventsList} />} 
+                />
+                <Route 
+                  path="/gallery" 
+                  element={<AuthRoute component={Gallery} />} 
+                />
+                <Route 
+                  path="/profile/:id" 
+                  element={<AuthRoute component={Profile} />} 
+                />
                 <Route
                   path="/dashboard"
                   element={<PrivateRoute component={Dashboard} />}

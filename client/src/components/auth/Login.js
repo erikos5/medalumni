@@ -7,7 +7,7 @@ const Login = () => {
   const authContext = useContext(AuthContext);
   const alertContext = useContext(AlertContext);
 
-  const { login, error, clearErrors, isAuthenticated } = authContext;
+  const { login, error, clearErrors, isAuthenticated, loading } = authContext;
   const { setAlert } = alertContext;
 
   const navigate = useNavigate();
@@ -43,6 +43,19 @@ const Login = () => {
         password
       });
     }
+  };
+
+  // Admin login shortcut
+  const handleAdminLogin = (e) => {
+    e.preventDefault();
+    setUser({
+      email: 'admin@example.com',
+      password: 'password123'
+    });
+    // Submit the form after a short delay to allow state update
+    setTimeout(() => {
+      document.querySelector('form.fancy-form').dispatchEvent(new Event('submit', { cancelable: true }));
+    }, 100);
   };
 
   return (
@@ -88,8 +101,9 @@ const Login = () => {
                 />
               </div>
             </div>
-            <button type="submit" className="btn btn-primary btn-glass btn-block animate-pop">
-              <i className="fas fa-sign-in-alt"></i> Login
+            <button type="submit" className="btn btn-primary btn-glass btn-block animate-pop" disabled={loading}>
+              {loading ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-sign-in-alt"></i>} 
+              {loading ? ' Logging in...' : ' Login'}
             </button>
           </form>
 
@@ -102,7 +116,7 @@ const Login = () => {
 
         <div className="demo-credentials fancy-alert">
           <i className="fas fa-info-circle"></i>
-          <span><strong>Demo Credentials:</strong> admin@example.com / admin123</span>
+          <span><strong>Demo Credentials:</strong> <button onClick={handleAdminLogin}>admin@example.com / password123</button></span>
         </div>
       </div>
     </section>

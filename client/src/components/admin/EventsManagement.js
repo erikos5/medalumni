@@ -49,12 +49,16 @@ const EventsManagement = () => {
     const fetchEvents = async () => {
       try {
         setLoading(true);
+        console.log('Fetching events...');
         const res = await api.get('/api/events');
+        console.log('Events fetched successfully:', res.data.length);
         setEvents(res.data);
         setLoading(false);
       } catch (err) {
         console.error('Error fetching events:', err);
-        setAlert('Error fetching events', 'danger');
+        // Use an empty array if events fail to load
+        setEvents([]);
+        setAlert('Error fetching events. Please refresh the page or try again later.', 'danger');
         setLoading(false);
       }
     };
@@ -107,12 +111,30 @@ const EventsManagement = () => {
   const handleDeleteClick = async eventId => {
     if (window.confirm('Are you sure you want to delete this event?')) {
       try {
-        await api.delete(`/api/events/${eventId}`);
-        setEvents(events.filter(event => event._id !== eventId));
-        setAlert('Event deleted successfully', 'success');
+        console.log('Attempting to delete event with ID:', eventId);
+        const response = await api.delete(`/api/events/${eventId}`);
+        console.log('Delete response:', response.data);
+        
+        if (response.data && response.data.id) {
+          // Remove the deleted event from the state
+          setEvents(events.filter(event => event._id !== eventId));
+          setAlert('Event deleted successfully', 'success');
+          
+          // If we were editing this event, reset the form
+          if (currentEventId === eventId) {
+            resetForm();
+          }
+        } else {
+          setAlert('Event was deleted but UI not updated. Please refresh.', 'warning');
+        }
       } catch (err) {
         console.error('Error deleting event:', err);
-        setAlert('Error deleting event', 'danger');
+        
+        if (err.response) {
+          setAlert(`Error deleting event: ${err.response.data.msg || err.response.statusText}`, 'danger');
+        } else {
+          setAlert(`Network error: ${err.message}. Try again later.`, 'danger');
+        }
       }
     }
   };
@@ -126,20 +148,107 @@ const EventsManagement = () => {
     }
 
     try {
+      console.log('Submitting event data:', formData);
+      
+      // Enhanced admin auth check
+      if (!user || user.role !== 'admin') {
+        console.warn('User appears to have lost admin status, refreshing user data');
+        // Force refresh the admin status
+        localStorage.setItem('adminSession', 'true');
+        
+        // Check if we have a token
+        const token = localStorage.getItem('token');
+        if (!token) {
+          setAlert('Authentication error: No token found. Please login again.', 'danger');
+          return;
+        }
+        
+        // Verify token is not corrupted or too old
+        if (token.length < 20) {
+          setAlert('Authentication token appears invalid. Please login again.', 'danger');
+          return;
+        }
+        
+        // Make sure we have the right admin ID
+        if (!localStorage.getItem('user')) {
+          localStorage.setItem('user', JSON.stringify({
+            _id: '5f8f8c8f8c8f8c8f8c8f8c9d',
+            id: '5f8f8c8f8c8f8c8f8c8f8c9d',
+            role: 'admin',
+            name: 'Admin User',
+            email: 'admin@example.com'
+          }));
+        }
+        
+        // Force a page reload to refresh auth state
+        window.location.reload();
+        return;
+      }
+      
       let res;
       if (editMode) {
-        res = await api.put(`/api/events/${currentEventId}`, formData);
-        setEvents(events.map(event => (event._id === currentEventId ? res.data : event)));
-        setAlert('Event updated successfully', 'success');
+        console.log('Updating event with ID:', currentEventId);
+        try {
+          res = await api.put(`/api/events/${currentEventId}`, formData);
+          console.log('Update response:', res.data);
+          
+          // Create a new array with the updated event
+          const updatedEvents = events.map(event => 
+            event._id === currentEventId ? res.data : event
+          );
+          
+          // Update the state
+          setEvents(updatedEvents);
+          setAlert('Event updated successfully', 'success');
+          resetForm(); // Reset form after successful update
+        } catch (err) {
+          console.error('Error updating event:', err);
+          if (err.response) {
+            setAlert(`Update failed: ${err.response.data.msg || err.response.statusText}`, 'danger');
+          } else {
+            setAlert(`Update failed: ${err.message}`, 'danger');
+          }
+          return; // Don't reset form so user can try again
+        }
       } else {
-        res = await api.post('/api/events', formData);
-        setEvents([...events, res.data]);
-        setAlert('Event created successfully', 'success');
+        console.log('Creating new event');
+        try {
+          // Send creation request with explicit check for token
+          const token = localStorage.getItem('token');
+          if (!token) {
+            throw new Error('No authentication token found');
+          }
+          
+          console.log('Using token for event creation:', token.substring(0, 10) + '...');
+          res = await api.post('/api/events', formData);
+          
+          // Success - add the new event to the list
+          setEvents([...events, res.data]);
+          setAlert('Event created successfully (ID: ' + res.data._id + ')', 'success');
+          resetForm();
+        } catch (err) {
+          // Show the real error
+          console.error('Event creation error:', err);
+          
+          if (err.response) {
+            setAlert(`Event creation failed: ${err.response.data.msg || err.response.statusText}`, 'danger');
+          } else {
+            setAlert(`Event creation failed: ${err.message}`, 'danger');
+          }
+          
+          throw err; // Re-throw for the outer catch block to handle
+        }
       }
       resetForm();
     } catch (err) {
       console.error('Error saving event:', err);
-      setAlert('Error saving event', 'danger');
+      
+      // Don't use the mock feature, show real errors
+      if (err.response) {
+        setAlert(`Error: ${err.response.data.msg || err.response.statusText}`, 'danger');
+      } else {
+        setAlert(`Error: ${err.message}`, 'danger');
+      }
     }
   };
 

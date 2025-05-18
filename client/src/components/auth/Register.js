@@ -7,7 +7,7 @@ const Register = () => {
   const authContext = useContext(AuthContext);
   const alertContext = useContext(AlertContext);
 
-  const { register, error, clearErrors, isAuthenticated } = authContext;
+  const { register, error, clearErrors, isAuthenticated, loading } = authContext;
   const { setAlert } = alertContext;
 
   const navigate = useNavigate();
@@ -151,8 +151,9 @@ const Register = () => {
               </small>
             </div>
             
-            <button type="submit" className="btn btn-primary btn-glass btn-block animate-pop">
-              <i className="fas fa-user-plus"></i> Register
+            <button type="submit" className="btn btn-primary btn-glass btn-block animate-pop" disabled={loading}>
+              {loading ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-user-plus"></i>} 
+              {loading ? ' Registering...' : ' Register'}
             </button>
           </form>
 

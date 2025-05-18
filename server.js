@@ -3,6 +3,7 @@ const connectDB = require('./config/db');
 const path = require('path');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const cookieParser = require('cookie-parser');
 
 // Load environment variables
 dotenv.config();
@@ -17,8 +18,22 @@ connectDB().then(connected => {
 });
 
 // Init Middleware
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:3000', 'http://localhost:3001'],
+  credentials: true
+}));
 app.use(express.json({ extended: false }));
+app.use(cookieParser());
+
+// Add debugging middleware
+app.use((req, res, next) => {
+  if (req.path.includes('/api/events') && req.method === 'POST') {
+    console.log('Event creation request received');
+    console.log('Headers:', JSON.stringify(req.headers));
+    console.log('Body:', JSON.stringify(req.body));
+  }
+  next();
+});
 
 // Make uploads folder accessible
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
