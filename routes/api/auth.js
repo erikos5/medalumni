@@ -5,6 +5,8 @@ const jwt = require('jsonwebtoken');
 const { check, validationResult } = require('express-validator');
 const auth = require('../../middleware/auth');
 const User = require('../../models/User');
+const Profile = require('../../models/Profile');
+const School = require('../../models/School');
 const mongoose = require('mongoose');
 
 // @route   GET api/auth
@@ -155,6 +157,40 @@ router.post(
       user.password = await bcrypt.hash(password, salt);
 
       await user.save();
+      
+      // Create a pending profile for the user
+      try {
+        // Get the default school to assign
+        let defaultSchool = await School.findOne();
+        
+        // If no school exists, create a default one
+        if (!defaultSchool) {
+          console.log('No schools found in database. Creating a default school.');
+          defaultSchool = new School({
+            name: 'School of Business',
+            description: 'Default school created by the system'
+          });
+          await defaultSchool.save();
+          console.log(`Created default school: ${defaultSchool.name} (${defaultSchool._id})`);
+        }
+        
+        console.log(`Creating pending profile for new user ${name} (${email})`);
+        
+        // Create a new pending profile
+        const newProfile = new Profile({
+          user: user._id,
+          school: defaultSchool._id,
+          graduationYear: new Date().getFullYear(),
+          degree: 'Pending Degree Information',
+          status: 'pending'
+        });
+        
+        await newProfile.save();
+        console.log(`Pending profile created successfully for ${email}`);
+      } catch (profileErr) {
+        console.error('Error creating pending profile:', profileErr);
+        // Continue with registration even if profile creation fails
+      }
 
       // Return jsonwebtoken
       const payload = {
