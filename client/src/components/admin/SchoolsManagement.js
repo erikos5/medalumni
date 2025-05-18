@@ -4,6 +4,7 @@ import AuthContext from '../../context/auth/AuthContext';
 import AlertContext from '../../context/alert/AlertContext';
 import Spinner from '../layout/Spinner';
 import api from '../../utils/api';
+import './SchoolsManagement.css';
 
 const SchoolsManagement = () => {
   const authContext = useContext(AuthContext);
