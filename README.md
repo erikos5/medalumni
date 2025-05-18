@@ -1,121 +1,197 @@
 # Mediterranean College Alumni Platform
 
-Εφαρμογή διαδικτύου για την υποστήριξη της ιστοσελίδας του Mediterranean College και ειδικά του γραφείου αποφοίτων.
+Web application for supporting the Mediterranean College website and specifically the alumni office.
 
-## Περιγραφή
+## Description
 
-Η εφαρμογή επιτρέπει την εγγραφή των αποφοίτων του Mediterranean College και την υποβολή και επεξεργασία των προσωπικών τους προφίλ. Τα προφίλ ομαδοποιούνται ανά σχολή του Mediterranean College. Τα δικαιώματα πρόσβασης χορηγούνται στους χρήστες σύμφωνα με 3 επίπεδα: Διαχειριστής, Εγγεγραμμένος Απόφοιτος, Αιτούμενος Απόφοιτος και Επισκέπτης.
+The Mediterranean College Alumni Platform enables graduates to register, create profiles, and connect with other alumni. The system provides different access levels based on user roles: Administrator, Registered Alumni, Applied Alumni, and Visitor.
 
-## Τεχνολογίες
+## Features
 
-Η εφαρμογή αναπτύχθηκε με:
+- **User Authentication**: Secure registration and login system
+- **Profile Management**: Alumni can create and edit their personal profiles
+- **Alumni Directory**: Browse and search the alumni catalog with filters
+- **School & Programs Catalog**: View information about college schools and programs
+- **Events System**: Browse upcoming events and register for them
+- **Admin Panel**: Complete administration interface for managing:
+  - User Profiles
+  - Schools and Programs
+  - Events
+  - Photo Galleries
+  - System Statistics
+
+## Technologies
 
 ### Backend
 - Node.js
 - Express.js
-- MongoDB με Mongoose
-- JWT για αυθεντικοποίηση
+- MongoDB with Mongoose
+- JWT for authentication
 
 ### Frontend
 - React
-- React Router για πλοήγηση
-- Context API για διαχείριση καταστάσεων
-- Axios για HTTP αιτήματα
+- React Router for navigation
+- Context API for state management
+- Axios for HTTP requests
 
-## Εγκατάσταση
+## Setup Guide
 
-1. Κλωνοποιήστε το repository
+### Prerequisites
+
+- Node.js (v14.x or higher)
+- MongoDB (local installation or MongoDB Atlas account)
+- Git
+
+### Installation
+
+1. Clone the repository
 ```
 git clone https://github.com/yourusername/mediterranean-alumni.git
 cd mediterranean-alumni
 ```
 
-2. Εγκαταστήστε τα dependencies για το backend
+2. Install backend dependencies
 ```
 npm install
 ```
 
-3. Εγκαταστήστε τα dependencies για το frontend
+3. Install frontend dependencies
 ```
 cd client
 npm install
+cd ..
 ```
 
-4. Δημιουργήστε ένα αρχείο .env στην κύρια διαδρομή με τις ακόλουθες μεταβλητές:
+4. Create a `.env` file in the root directory with the following variables:
 ```
 NODE_ENV=development
-PORT=5000
+PORT=5006
 MONGO_URI=mongodb://localhost:27017/mediterranean-alumni
-JWT_SECRET=your_jwt_secret
+JWT_SECRET=your_jwt_secret_key_here
 ```
 
-## Εκτέλεση
+### MongoDB Setup
 
-### Ανάπτυξη
-Για να τρέξετε την εφαρμογή σε περιβάλλον ανάπτυξης (και το frontend και το backend):
+You can either:
+
+1. Use a local MongoDB installation:
+   - Make sure MongoDB is installed and running on your system
+   - The application will create the database automatically
+
+2. Or use MongoDB Atlas:
+   - Create a free MongoDB Atlas account
+   - Set up a cluster and get your connection string
+   - Update the `MONGO_URI` in your `.env` file with your Atlas connection string
+
+### Database Seeding
+
+The application can run with mock data if MongoDB is not available, but for full functionality:
+
+1. Start the application (instructions below)
+2. The database will be seeded automatically with:
+   - Schools and programs
+   - Sample users and profiles
+   - Event data
+   - Sample photo galleries
+
+### Running the Application
+
+#### Development Mode
+To run the application in development environment (both frontend and backend):
 ```
 npm run dev
 ```
 
-Για να τρέξετε μόνο το backend:
+To run only the backend:
 ```
 npm run server
 ```
 
-Για να τρέξετε μόνο το frontend:
+To run only the frontend:
 ```
 npm run client
 ```
 
-### Παραγωγή
-Για να χτίσετε το frontend για παραγωγή:
+#### Production Mode
+To build the frontend for production:
 ```
 cd client
 npm run build
+cd ..
 ```
 
-Για να τρέξετε την εφαρμογή σε περιβάλλον παραγωγής:
+To run the application in production environment:
 ```
 npm start
 ```
 
-## Δομή του Project
+### Default Login Credentials
+
+The application comes with the following pre-configured accounts:
+
+**Admin User**:
+- Email: admin@example.com
+- Password: password123
+
+**Regular Users**:
+- Email: johndoe@example.com
+- Password: password123
+- Email: janesmith@example.com
+- Password: password123
+
+## Project Structure
 
 ```
 mediterranean-alumni/
 ├── client/                 # React frontend
-│   ├── public/             # Στατικά αρχεία
-│   └── src/                # Πηγαίος κώδικας React
+│   ├── public/             # Static files
+│   └── src/                # React source code
 │       ├── components/     # React components
 │       ├── context/        # Context API
-│       └── utils/          # Βοηθητικές συναρτήσεις
-├── config/                 # Ρυθμίσεις για το backend
+│       └── utils/          # Helper functions
+├── config/                 # Backend configuration
 ├── middleware/             # Express middleware
-├── models/                 # Mongoose μοντέλα
+├── models/                 # Mongoose models
 ├── routes/                 # Express routes
 │   └── api/                # API endpoints
-├── uploads/                # Μεταφορτωμένα αρχεία
-├── .env                    # Μεταβλητές περιβάλλοντος
-├── .gitignore              # Αρχεία που αγνοούνται από το Git
-├── package.json            # Dependencies backend
-└── server.js               # Κύριο αρχείο Express
+├── uploads/                # Uploaded files
+├── .env                    # Environment variables
+├── .gitignore              # Files ignored by Git
+├── package.json            # Backend dependencies
+└── server.js               # Main Express file
 ```
 
-## Λειτουργίες
+## Key Components
 
-- Εγγραφή και σύνδεση χρηστών
-- Δημιουργία και επεξεργασία προφίλ αποφοίτων
-- Διαχείριση σχολών (για διαχειριστές)
-- Έγκριση αιτήσεων εγγραφής (για διαχειριστές)
-- Προβολή καταλόγου αποφοίτων με φίλτρα
-- Προβολή λεπτομερών προφίλ αποφοίτων
+### Client-side
+- **Authentication System**: Secure JWT-based authentication
+- **Context API**: Global state management for auth, alerts, and theme
+- **Protected Routes**: Role-based access control
+- **Responsive Design**: Mobile-friendly user interface
 
-## Συνεισφορά
+### Server-side
+- **RESTful API**: Well-structured endpoints
+- **MongoDB Models**: Mongoose schemas for data storage
+- **Middleware**: Authentication, admin access control
+- **Error Handling**: Consistent error responses
 
-Για να συνεισφέρετε σε αυτό το project, ακολουθήστε τα εξής βήματα:
+## Troubleshooting
 
-1. Κάντε fork του repository
-2. Δημιουργήστε ένα branch για τη λειτουργία σας (`git checkout -b feature/amazing-feature`)
-3. Κάντε commit τις αλλαγές σας (`git commit -m 'Add some amazing feature'`)
-4. Κάντε push στο branch (`git push origin feature/amazing-feature`)
-5. Ανοίξτε ένα Pull Request 
+### Connection Issues
+- Ensure MongoDB is running if using a local installation
+- Check your MongoDB connection string in the `.env` file
+- Verify the correct port is set in the `.env` file
+
+### Authentication Problems
+- Clear your browser's localStorage if experiencing login issues
+- Reset your browser cache if styles or scripts aren't updating
+
+## Contributing
+
+To contribute to this project, follow these steps:
+
+1. Fork the repository
+2. Create a branch for your feature (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request 

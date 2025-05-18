@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Spinner from '../layout/Spinner';
 
-// Mock data - θα αντικατασταθεί με API κλήσεις όταν το backend είναι έτοιμο
+// Mock data - will be replaced with API calls when backend is ready
 import { mockSchools } from '../admin/AdminDashboard';
 
 const ProgramsList = () => {
@@ -14,11 +14,11 @@ const ProgramsList = () => {
   });
 
   useEffect(() => {
-    // Φορτώνουμε τα mock δεδομένα
+    // Loading mock data
     setSchools(mockSchools);
     setLoading(false);
 
-    // Όταν έχουμε το backend έτοιμο:
+    // When we have the backend ready:
     // const fetchSchools = async () => {
     //   try {
     //     const res = await axios.get('/api/schools');
@@ -45,14 +45,14 @@ const ProgramsList = () => {
     });
   };
 
-  // Φιλτράρισμα σχολών και προγραμμάτων
+  // Filtering schools and programs
   const filteredSchools = schools.filter(school => {
     if (schoolId && schoolId !== '' && school._id !== schoolId) {
       return false;
     }
     
     if (programType && programType !== '') {
-      // Ελέγχουμε αν η σχολή έχει προγράμματα του επιλεγμένου τύπου
+      // Check if the school has programs of the selected type
       return school.programs && 
         school.programs[programType] && 
         school.programs[programType].length > 0;
@@ -67,17 +67,17 @@ const ProgramsList = () => {
 
   return (
     <div className="container">
-      <h1 className="large text-primary">Κατάλογος Προγραμμάτων Σπουδών</h1>
+      <h1 className="large text-primary">Study Programs Catalog</h1>
       <p className="lead">
-        <i className="fas fa-graduation-cap"></i> Όλα τα προγράμματα σπουδών του Mediterranean College
+        <i className="fas fa-graduation-cap"></i> All study programs offered by Mediterranean College
       </p>
 
       <div className="programs-filter bg-light p-2 my-2">
-        <h4>Φίλτρα Αναζήτησης</h4>
+        <h4>Search Filters</h4>
         <div className="form">
           <div className="form-group">
             <select name="schoolId" value={schoolId} onChange={onChange}>
-              <option value="">Όλες οι Σχολές</option>
+              <option value="">All Schools</option>
               {schools.map(s => (
                 <option key={s._id} value={s._id}>
                   {s.name}
@@ -87,14 +87,14 @@ const ProgramsList = () => {
           </div>
           <div className="form-group">
             <select name="programType" value={programType} onChange={onChange}>
-              <option value="">Όλοι οι Τύποι Προγραμμάτων</option>
-              <option value="undergraduate">Προπτυχιακά</option>
-              <option value="postgraduate">Μεταπτυχιακά</option>
-              <option value="professional">Επαγγελματικής Εξειδίκευσης</option>
+              <option value="">All Program Types</option>
+              <option value="undergraduate">Undergraduate</option>
+              <option value="postgraduate">Postgraduate</option>
+              <option value="professional">Professional Specialization</option>
             </select>
           </div>
           <button onClick={resetFilters} className="btn btn-light">
-            Επαναφορά Φίλτρων
+            Reset Filters
           </button>
         </div>
       </div>
@@ -110,7 +110,7 @@ const ProgramsList = () => {
                 <div className="programs-container">
                   {school.programs.undergraduate && school.programs.undergraduate.length > 0 && (
                     <div className="program-category">
-                      <h3>Προπτυχιακά</h3>
+                      <h3>Undergraduate</h3>
                       <ul>
                         {school.programs.undergraduate.map((program, index) => (
                           <li key={index} className="program-item">
@@ -123,7 +123,7 @@ const ProgramsList = () => {
                   
                   {school.programs.postgraduate && school.programs.postgraduate.length > 0 && (
                     <div className="program-category">
-                      <h3>Μεταπτυχιακά</h3>
+                      <h3>Postgraduate</h3>
                       <ul>
                         {school.programs.postgraduate.map((program, index) => (
                           <li key={index} className="program-item">
@@ -136,7 +136,7 @@ const ProgramsList = () => {
                   
                   {school.programs.professional && school.programs.professional.length > 0 && (
                     <div className="program-category">
-                      <h3>Επαγγελματικής Εξειδίκευσης</h3>
+                      <h3>Professional Specialization</h3>
                       <ul>
                         {school.programs.professional.map((program, index) => (
                           <li key={index} className="program-item">
@@ -153,9 +153,9 @@ const ProgramsList = () => {
                 <div className="programs-container">
                   <div className="program-category">
                     <h3>
-                      {programType === 'undergraduate' && 'Προπτυχιακά'}
-                      {programType === 'postgraduate' && 'Μεταπτυχιακά'}
-                      {programType === 'professional' && 'Επαγγελματικής Εξειδίκευσης'}
+                      {programType === 'undergraduate' && 'Undergraduate'}
+                      {programType === 'postgraduate' && 'Postgraduate'}
+                      {programType === 'professional' && 'Professional Specialization'}
                     </h3>
                     <ul>
                       {school.programs[programType].map((program, index) => (
@@ -170,13 +170,13 @@ const ProgramsList = () => {
               
               <div className="buttons">
                 <Link to={`/profiles?school=${school._id}`} className="btn btn-primary">
-                  <i className="fas fa-users"></i> Απόφοιτοι Σχολής
+                  <i className="fas fa-users"></i> School Alumni
                 </Link>
               </div>
             </div>
           ))
         ) : (
-          <h4>Δεν βρέθηκαν προγράμματα με βάση τα επιλεγμένα φίλτρα...</h4>
+          <h4>No programs found based on the selected filters...</h4>
         )}
       </div>
     </div>

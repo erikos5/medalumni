@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
 import Landing from './components/layout/Landing';
 import Footer from './components/layout/Footer';
@@ -17,6 +17,7 @@ import PendingProfiles from './components/admin/PendingProfiles';
 import SchoolsManagement from './components/admin/SchoolsManagement';
 import SystemStatistics from './components/admin/SystemStatistics';
 import PhotoManagement from './components/admin/PhotoManagement';
+import EventsManagement from './components/admin/EventsManagement';
 import PrivateRoute from './components/routing/PrivateRoute';
 import AdminRoute from './components/routing/AdminRoute';
 import Alert from './components/layout/Alert';
@@ -26,14 +27,9 @@ import AuthState from './context/auth/AuthState';
 import AlertState from './context/alert/AlertState';
 import ThemeState from './context/theme/ThemeState';
 
-// Utils
-import setAuthToken from './utils/setAuthToken';
-
 import './App.css';
 
-if (localStorage.token) {
-  setAuthToken(localStorage.token);
-}
+// NOTE: Token initialization moved to AuthState useEffect
 
 const App = () => {
   return (
@@ -80,6 +76,10 @@ const App = () => {
                 <Route
                   path="/admin/gallery"
                   element={<AdminRoute component={PhotoManagement} />}
+                />
+                <Route
+                  path="/admin/events"
+                  element={<AdminRoute component={EventsManagement} />}
                 />
               </Routes>
               <Footer />

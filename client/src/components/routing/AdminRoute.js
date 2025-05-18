@@ -8,27 +8,22 @@ const AdminRoute = ({ component: Component }) => {
   const { isAuthenticated, loading, user, getUser } = authContext;
 
   useEffect(() => {
-    // Try to load user if not already authenticated
-    if (!isAuthenticated && !loading) {
-      console.log('AdminRoute: Not authenticated, attempting to load user');
+    // Only attempt to load user if the token exists but user is not authenticated yet
+    if (!isAuthenticated && !loading && localStorage.getItem('token')) {
       getUser();
     }
   }, [isAuthenticated, loading, getUser]);
 
-  // Debug states
-  console.log('AdminRoute - Authentication state:', { isAuthenticated, loading, user });
-
-  if (loading || !user) {
-    console.log('AdminRoute: Loading or user not loaded...');
+  if (loading) {
     return <Spinner />;
   }
 
   if (isAuthenticated && user && user.role === 'admin') {
-    console.log('AdminRoute: User is admin, rendering component');
     return <Component />;
   } else {
-    console.log('AdminRoute: User is not admin, redirecting to dashboard');
-    return <Navigate to="/dashboard" />;
+    // If authenticated but not admin, go to regular dashboard
+    // If not authenticated, go to login
+    return <Navigate to={isAuthenticated ? "/dashboard" : "/login"} />;
   }
 };
 

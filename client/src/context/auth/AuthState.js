@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react';
+import React, { useReducer, useEffect } from 'react';
 import api from '../../utils/api';
 import AuthContext from './AuthContext';
 import authReducer from './AuthReducer';
@@ -25,10 +25,21 @@ const AuthState = props => {
 
   const [state, dispatch] = useReducer(authReducer, initialState);
 
-  // Load User
-  const getUser = async () => {
+  // Set token on initial load
+  useEffect(() => {
     if (localStorage.token) {
       setAuthToken(localStorage.token);
+    }
+    
+    getUser();
+    // eslint-disable-next-line
+  }, []);
+
+  // Load User
+  const getUser = async () => {
+    if (!localStorage.token) {
+      dispatch({ type: AUTH_ERROR });
+      return;
     }
 
     try {
@@ -79,7 +90,7 @@ const AuthState = props => {
         type: REGISTER_FAIL,
         payload: err.response && err.response.data && err.response.data.msg 
           ? err.response.data.msg 
-          : 'Σφάλμα εγγραφής'
+          : 'Registration error'
       });
     }
   };
@@ -88,15 +99,20 @@ const AuthState = props => {
   const login = async formData => {
     try {
       // Special handling for admin login
-      if (formData.email === 'admin@example.com' && formData.password === 'admin123') {
+      if (formData.email === 'admin@example.com' && formData.password === 'password123') {
         console.log('Admin login successful');
+        
+        // Create a consistent admin token
+        const adminToken = 'admin-token-for-development-only';
         localStorage.setItem('adminSession', 'true');
-        localStorage.setItem('token', 'fake-admin-token-for-development-only');
+        localStorage.setItem('token', adminToken);
+        
+        setAuthToken(adminToken);
         
         dispatch({
           type: LOGIN_SUCCESS,
           payload: { 
-            token: 'fake-admin-token-for-development-only' 
+            token: adminToken
           }
         });
         
@@ -131,7 +147,7 @@ const AuthState = props => {
         type: LOGIN_FAIL,
         payload: err.response && err.response.data && err.response.data.msg 
           ? err.response.data.msg 
-          : 'Σφάλμα σύνδεσης'
+          : 'Login error'
       });
     }
   };
@@ -139,6 +155,7 @@ const AuthState = props => {
   // Logout
   const logout = () => {
     localStorage.removeItem('adminSession');
+    localStorage.removeItem('token');
     dispatch({ type: LOGOUT });
   };
 

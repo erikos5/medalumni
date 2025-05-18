@@ -8,26 +8,19 @@ const PrivateRoute = ({ component: Component }) => {
   const { isAuthenticated, loading, getUser } = authContext;
 
   useEffect(() => {
-    // Try to load user if not already authenticated
-    if (!isAuthenticated && !loading) {
-      console.log('PrivateRoute: Not authenticated, attempting to load user');
+    // Only attempt to load user if the token exists but user is not authenticated yet
+    if (!isAuthenticated && !loading && localStorage.getItem('token')) {
       getUser();
     }
   }, [isAuthenticated, loading, getUser]);
 
-  // Debug states
-  console.log('PrivateRoute - Authentication state:', { isAuthenticated, loading });
-
   if (loading) {
-    console.log('PrivateRoute: Loading...');
     return <Spinner />;
   }
 
   if (isAuthenticated) {
-    console.log('PrivateRoute: User is authenticated, rendering component');
     return <Component />;
   } else {
-    console.log('PrivateRoute: User is not authenticated, redirecting to login');
     return <Navigate to="/login" />;
   }
 };

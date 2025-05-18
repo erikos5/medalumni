@@ -21,4 +21,21 @@ api.interceptors.request.use(
   }
 );
 
+// Intercept responses and handle 401 errors (token expired or invalid)
+api.interceptors.response.use(
+  response => response,
+  error => {
+    if (error.response && error.response.status === 401) {
+      // If we get a 401 (Unauthorized), clear localStorage and reload
+      if (localStorage.getItem('token')) {
+        console.error('Auth token expired or invalid, logging out');
+        localStorage.removeItem('token');
+        localStorage.removeItem('adminSession');
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default api; 
