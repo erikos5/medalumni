@@ -53,7 +53,7 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-// Force port 5006 and ignore any environment variable setting to avoid port conflicts
-const PORT = 5006;
+// Force port 5006 for local development but allow Render.com to set its own port
+const PORT = process.env.PORT || 5006;
 
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
