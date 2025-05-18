@@ -99,7 +99,7 @@ const AuthState = props => {
   const login = async formData => {
     try {
       // Special handling for admin login
-      if (formData.email === 'admin@example.com' && formData.password === 'password123') {
+      if (formData.email === 'admin@example.com' && formData.password === 'admin123') {
         console.log('Admin login successful');
         
         // Create a consistent admin token

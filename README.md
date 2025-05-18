@@ -131,7 +131,7 @@ The application comes with the following pre-configured accounts:
 
 **Admin User**:
 - Email: admin@example.com
-- Password: password123
+- Password: admin123
 
 **Regular Users**:
 - Email: johndoe@example.com
