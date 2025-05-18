@@ -46,10 +46,15 @@ const AuthState = props => {
       // Mock user data for admin
       if (localStorage.getItem('adminSession') === 'true') {
         console.log('Admin session found, loading admin user data');
+        
+        // Create a more realistic MongoDB-style ID for the admin user
+        const adminUserId = '5f8f8c8f8c8f8c8f8c8f8c9d'; // Using a consistent ID from mockData
+        
         dispatch({
           type: USER_LOADED,
           payload: {
-            _id: 'admin-user-id',
+            _id: adminUserId,
+            id: adminUserId, // Include both formats for compatibility
             name: 'Administrator',
             email: 'admin@example.com',
             role: 'admin',
@@ -99,7 +104,7 @@ const AuthState = props => {
   const login = async formData => {
     try {
       // Special handling for admin login
-      if (formData.email === 'admin@example.com' && formData.password === 'admin123') {
+      if (formData.email === 'admin@example.com' && formData.password === 'password123') {
         console.log('Admin login successful');
         
         // Create a consistent admin token
@@ -116,10 +121,14 @@ const AuthState = props => {
           }
         });
         
+        // Create a more realistic MongoDB-style ID for the admin user
+        const adminUserId = '5f8f8c8f8c8f8c8f8c8f8c9d'; // Using a consistent ID from mockData
+        
         dispatch({
           type: USER_LOADED,
           payload: {
-            _id: 'admin-user-id',
+            _id: adminUserId,
+            id: adminUserId, // Include both formats for compatibility
             name: 'Administrator',
             email: 'admin@example.com',
             role: 'admin',

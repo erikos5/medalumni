@@ -95,12 +95,14 @@ router.post(
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('Validation errors in event creation:', errors.array());
       return res.status(400).json({ errors: errors.array() });
     }
 
     try {
-      const user = await User.findById(req.user.id).select('-password');
-
+      console.log('Creating event with data:', req.body);
+      console.log('User ID from token:', req.user.id);
+      
       const newEvent = new Event({
         title: req.body.title,
         description: req.body.description,
@@ -115,10 +117,15 @@ router.post(
       });
 
       const event = await newEvent.save();
+      console.log('Event created successfully:', event._id);
       res.json(event);
     } catch (err) {
-      console.error(err.message);
-      res.status(500).send('Server Error');
+      console.error('Error creating event:', err.message);
+      console.error(err.stack);
+      res.status(500).json({ 
+        msg: 'Server Error - Could not create event',
+        error: err.message
+      });
     }
   }
 );
