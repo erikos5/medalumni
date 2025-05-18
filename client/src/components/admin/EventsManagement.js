@@ -269,7 +269,7 @@ const EventsManagement = () => {
       </p>
 
       <div className="my-2">
-        <Link to="/admin" className="btn btn-light">
+        <Link to="/admin-dashboard" className="btn btn-light">
           <i className="fas fa-arrow-left"></i> Back to Dashboard
         </Link>
       </div>
