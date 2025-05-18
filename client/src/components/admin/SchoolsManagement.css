@@ -58,7 +58,8 @@
 
 .programs-section h4 {
   margin-bottom: 1rem;
-  color: var(--primary-color);
+  color: #007bff !important; /* Match the blue color */
+  font-weight: bold;
 }
 
 .program-form {
@@ -68,7 +69,8 @@
 .program-form label {
   display: block;
   margin-bottom: 0.5rem;
-  color: white !important;
+  color: #007bff !important; /* Match the blue color */
+  font-weight: 500;
 }
 
 .program-input-group {
@@ -141,7 +143,8 @@
 
 .program-category h5 {
   margin-bottom: 0.5rem;
-  color: var(--primary-color);
+  color: #007bff !important; /* Bright blue color */
+  font-weight: bold;
 }
 
 .program-category ul {
