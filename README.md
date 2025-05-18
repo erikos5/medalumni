@@ -65,6 +65,14 @@ cd ..
    - Add your MongoDB connection string to this file
    - Example: `mongodb+srv://username:password@cluster.mongodb.net/mediterranean-alumni?retryWrites=true&w=majority`
 
+5. Create a `.env` file in the root directory with the following variables:
+   ```
+   NODE_ENV=development
+   JWT_SECRET=your_secure_jwt_secret_key
+   ```
+   - The JWT_SECRET is used for signing authentication tokens
+   - You can generate a secure random string for JWT_SECRET using any secure random generator
+
 ### Running the Application
 
 Start both the backend and frontend with:
@@ -155,6 +163,14 @@ The application requires a valid MongoDB connection. If you're having issues:
 1. Check that your MongoDB server is running
 2. Verify the connection string in mongodb-uri.txt is correct
 3. Ensure your IP address is whitelisted if using MongoDB Atlas
+
+### Environment Variables
+
+If you're experiencing authentication issues or other unexpected behavior:
+
+1. Make sure your `.env` file exists in the project root
+2. Verify it contains the required variables (NODE_ENV, JWT_SECRET)
+3. Restart the server after making changes to the `.env` file
 
 ## Project Structure
 
