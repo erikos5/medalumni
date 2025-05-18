@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './Gallery.css';
 
 const mockAlbums = [
@@ -97,6 +97,9 @@ const Gallery = () => {
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const [photoModalOpen, setPhotoModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Reference to store the handleKeyDown function
+  const handleKeyDownRef = useRef(null);
 
   useEffect(() => {
     // Simulate API call with loading state
@@ -114,20 +117,6 @@ const Gallery = () => {
 
   const closeAlbum = () => {
     setSelectedAlbum(null);
-  };
-
-  const openPhotoModal = (photo) => {
-    setSelectedPhoto(photo);
-    setPhotoModalOpen(true);
-    // Add event listener for keyboard navigation
-    document.addEventListener('keydown', handleKeyDown);
-  };
-
-  const closePhotoModal = () => {
-    setPhotoModalOpen(false);
-    setSelectedPhoto(null);
-    // Remove event listener when modal is closed
-    document.removeEventListener('keydown', handleKeyDown);
   };
 
   const navigatePhoto = useCallback((direction) => {
@@ -151,9 +140,42 @@ const Gallery = () => {
     } else if (e.key === 'ArrowLeft') {
       navigatePhoto('prev');
     } else if (e.key === 'Escape') {
-      closePhotoModal();
+      setPhotoModalOpen(false);
+      setSelectedPhoto(null);
     }
   }, [navigatePhoto]);
+
+  // Store the latest handleKeyDown function in a ref
+  useEffect(() => {
+    handleKeyDownRef.current = handleKeyDown;
+  }, [handleKeyDown]);
+
+  // Manage event listeners when modal opens/closes
+  useEffect(() => {
+    const currentHandleKeyDown = (e) => {
+      if (handleKeyDownRef.current) {
+        handleKeyDownRef.current(e);
+      }
+    };
+
+    if (photoModalOpen) {
+      document.addEventListener('keydown', currentHandleKeyDown);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', currentHandleKeyDown);
+    };
+  }, [photoModalOpen]);
+
+  const openPhotoModal = (photo) => {
+    setSelectedPhoto(photo);
+    setPhotoModalOpen(true);
+  };
+
+  const closePhotoModal = useCallback(() => {
+    setPhotoModalOpen(false);
+    setSelectedPhoto(null);
+  }, []);
 
   const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };

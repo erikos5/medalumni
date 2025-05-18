@@ -8,7 +8,8 @@ import Spinner from '../layout/Spinner';
 const ProfileForm = () => {
   const authContext = useContext(AuthContext);
   const alertContext = useContext(AlertContext);
-  const { user, loading } = authContext;
+
+  const { loading } = authContext;
   const { setAlert } = alertContext;
 
   const navigate = useNavigate();

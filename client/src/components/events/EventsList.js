@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import Spinner from '../layout/Spinner';
 import AuthContext from '../../context/auth/AuthContext';
 import AlertContext from '../../context/alert/AlertContext';
@@ -11,10 +11,13 @@ const EventsList = () => {
   const alertContext = useContext(AlertContext);
   const { isAuthenticated, user } = authContext;
   const { setAlert } = alertContext;
+  const navigate = useNavigate();
 
   const [events, setEvents] = useState([]);
   const [filteredEvents, setFilteredEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [alertShown, setAlertShown] = useState(false);
   const [filters, setFilters] = useState({
     category: 'all',
     onlyFuture: true,
@@ -22,6 +25,45 @@ const EventsList = () => {
   });
 
   useEffect(() => {
+    // Check if user is authenticated and has proper role
+    const checkAccess = () => {
+      if (!isAuthenticated) {
+        console.log('User not authenticated, redirecting to login');
+        return false;
+      }
+
+      // Allow admin users to access events
+      if (user && user.role === 'admin') {
+        console.log('Admin user, allowing access');
+        return true;
+      }
+
+      // Check if user is an approved alumni (registeredAlumni)
+      if (user && user.role === 'registeredAlumni') {
+        console.log('Registered alumni, allowing access');
+        return true;
+      }
+
+      // Non-approved users (appliedAlumni) should not see events
+      console.log('User role not approved for events:', user?.role);
+      setError('Access denied. Only approved alumni can view events.');
+      
+      // Show alert only once and redirect
+      if (!alertShown && user && user.role === 'appliedAlumni') {
+        setAlert('Your profile needs to be approved to view events', 'info');
+        setAlertShown(true);
+        navigate('/dashboard');
+      }
+      
+      return false;
+    };
+
+    const hasAccess = checkAccess();
+    if (!hasAccess) {
+      setLoading(false);
+      return;
+    }
+
     // Fetch events from API
     const fetchEvents = async () => {
       try {
@@ -48,13 +90,14 @@ const EventsList = () => {
       } catch (err) {
         console.error('Error fetching events:', err);
         setAlert('Error fetching events', 'danger');
+        setError('Failed to load events. Please try again later.');
       } finally {
         setLoading(false);
       }
     };
 
     fetchEvents();
-  }, [setAlert]);
+  }, [isAuthenticated, user, setAlert, alertShown, navigate]);
 
   useEffect(() => {
     // Apply filters
@@ -118,8 +161,27 @@ const EventsList = () => {
     alert(`You've registered for event #${eventId}. You'll receive confirmation by email.`);
   };
 
+  // Redirect unapproved users - moved to useEffect to prevent multiple alerts
+  if (user && user.role === 'appliedAlumni') {
+    return <Navigate to="/dashboard" />;
+  }
+
   if (loading) {
     return <Spinner />;
+  }
+
+  if (error) {
+    return (
+      <div className="container">
+        <h1 className="large text-primary">Events</h1>
+        <div className="alert alert-danger">{error}</div>
+        <p>
+          <Link to="/dashboard" className="btn btn-light">
+            <i className="fas fa-arrow-left"></i> Return to Dashboard
+          </Link>
+        </p>
+      </div>
+    );
   }
 
   return (
@@ -171,12 +233,21 @@ const EventsList = () => {
       
       <div className="events-list">
         {filteredEvents.length === 0 ? (
-          <p>No events found matching your criteria.</p>
+          <div className="no-events">
+            <h4>No events found matching your criteria.</h4>
+            <p>Try adjusting your search criteria or check back later for upcoming events.</p>
+          </div>
         ) : (
           filteredEvents.map(event => (
             <div key={event.id} className="event-card bg-light">
               <div className="event-image">
-                <img src={event.image} alt={event.title} />
+                {event.image ? (
+                  <img src={event.image} alt={event.title} />
+                ) : (
+                  <div className="event-placeholder-image">
+                    <i className="fas fa-calendar-day fa-4x"></i>
+                  </div>
+                )}
               </div>
               <div className="event-details">
                 <h2>{event.title}</h2>

@@ -1,15 +1,12 @@
 import React, { useEffect, useContext } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import AuthContext from '../../context/auth/AuthContext';
-import AlertContext from '../../context/alert/AlertContext';
 import Spinner from '../layout/Spinner';
 import DashboardMenu from './DashboardMenu';
 
 const Dashboard = () => {
   const authContext = useContext(AuthContext);
-  const alertContext = useContext(AlertContext);
   const { user, loading, getUser } = authContext;
-  const { setAlert } = alertContext;
 
   useEffect(() => {
     // Verify user is loaded
