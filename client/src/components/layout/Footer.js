@@ -5,7 +5,7 @@ const Footer = () => {
   
   return (
     <footer className="footer">
-      <p>© {year} Mediterranean College Alumni. Με επιφύλαξη παντός δικαιώματος.</p>
+      <p>© {year} Mediterranean College Alumni. All rights reserved.</p>
     </footer>
   );
 };
