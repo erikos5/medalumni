@@ -881,6 +881,26 @@ textarea {
   color: #f8f9fa;
 }
 
+.theme-toggle-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  position: relative;
+}
+
+.theme-toggle-btn:disabled:hover::after {
+  content: 'Dark mode is permanent';
+  position: absolute;
+  bottom: -30px;
+  right: 0;
+  background-color: #333;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 100;
+}
+
 /* Dark Mode Styles */
 .dark-mode {
   --primary-color: #64b5f6;

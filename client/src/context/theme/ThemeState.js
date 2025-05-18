@@ -1,34 +1,17 @@
-import React, { useReducer, useEffect } from 'react';
+import React, { useReducer, useEffect, useCallback } from 'react';
 import ThemeContext from './ThemeContext';
 import themeReducer from './themeReducer';
 import { SET_THEME } from '../types';
 
 const ThemeState = props => {
+  // Always initialize with dark mode
   const initialState = {
-    darkMode: false
+    darkMode: true
   };
 
   const [state, dispatch] = useReducer(themeReducer, initialState);
 
-  // Έλεγχος για προτιμώμενο θέμα από το σύστημα ή τοπική αποθήκευση
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('darkMode');
-    
-    if (savedTheme !== null) {
-      // Αν υπάρχει αποθηκευμένη προτίμηση
-      const isDarkMode = JSON.parse(savedTheme);
-      toggleTheme(isDarkMode);
-    } else {
-      // Έλεγχος προτίμησης του συστήματος
-      const prefersDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      toggleTheme(prefersDarkMode);
-    }
-    
-    // Εφαρμογή του κατάλληλου θέματος στο html element
-    applyTheme(state.darkMode);
-  }, []);
-
-  // Εφαρμογή του θέματος στο html element
+  // Apply theme to html element
   const applyTheme = (isDarkMode) => {
     if (isDarkMode) {
       document.documentElement.classList.add('dark-mode');
@@ -37,9 +20,10 @@ const ThemeState = props => {
     }
   };
 
-  // Εναλλαγή θέματος
-  const toggleTheme = (forceValue = null) => {
-    const newDarkMode = forceValue !== null ? forceValue : !state.darkMode;
+  // Force dark mode
+  const toggleTheme = useCallback((forceValue = null) => {
+    // Always use dark mode regardless of toggle
+    const newDarkMode = true;
     localStorage.setItem('darkMode', JSON.stringify(newDarkMode));
     
     dispatch({
@@ -48,7 +32,16 @@ const ThemeState = props => {
     });
     
     applyTheme(newDarkMode);
-  };
+  }, []);
+
+  // Initialize theme
+  useEffect(() => {
+    // Force dark mode
+    toggleTheme(true);
+    
+    // Apply dark mode
+    applyTheme(true);
+  }, [toggleTheme]);
 
   return (
     <ThemeContext.Provider

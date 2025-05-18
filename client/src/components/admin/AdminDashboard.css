@@ -1,0 +1,43 @@
+/* Admin Dashboard Styles */
+
+/* Fix for dark mode text visibility in blue buttons */
+.dark-mode .btn-primary,
+.dark-mode .btn-success,
+.dark-mode .btn-info {
+  color: white !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Ensure hover effects maintain good visibility */
+.dark-mode .btn:hover {
+  opacity: 0.9;
+  color: white !important;
+}
+
+/* Fix text visibility in admin-card blue buttons */
+.dark-mode .admin-card .btn-primary {
+  background-color: #007bff;
+  color: white !important;
+  border: none;
+}
+
+.dark-mode .admin-card .btn-primary:hover {
+  background-color: #0069d9;
+  color: white !important;
+}
+
+/* System Management Dashboard */
+.dark-mode .admin-section h2 {
+  color: #e9ecef;
+}
+
+/* If there are any blue containers with text that needs better visibility */
+.dark-mode [class*="btn-"],
+.dark-mode [class*="-primary"] {
+  color: white !important;
+}
+
+/* Ensure links in buttons are visible */
+.dark-mode .btn a {
+  color: inherit !important;
+} 
