@@ -13,15 +13,19 @@ const app = express();
 // Connect to Database
 connectDB().then(connected => {
   if (!connected) {
-    console.log('Note: App will use mock data instead of database');
+    console.log('Warning: Database connection failed. Some features may not work properly.');
+    console.log('Please check your MongoDB connection settings and ensure the database is accessible.');
   }
+}).catch(err => {
+  console.error('Fatal error during database connection:', err);
+  process.exit(1);
 });
 
 // Init Middleware
 app.use(cors({
-  origin: process.env.FRONTEND_URL 
-    ? [process.env.FRONTEND_URL, 'http://localhost:3000', 'http://localhost:3001']
-    : ['http://localhost:3000', 'http://localhost:3001'],
+  origin: process.env.NODE_ENV === 'production' 
+    ? process.env.FRONTEND_URL 
+    : ['http://localhost:3000', 'http://localhost:3001', '*'],
   credentials: true
 }));
 app.use(express.json({ extended: false }));
@@ -56,4 +60,8 @@ if (process.env.NODE_ENV === 'production') {
 // Force port 5006 for local development but allow Render.com to set its own port
 const PORT = process.env.PORT || 5006;
 
-app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server started on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
+});

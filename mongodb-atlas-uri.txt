@@ -1,0 +1,1 @@
+mongodb+srv://henrishani:Med2005!@alumni-cluster.7pjqg4a.mongodb.net/mediterranean-alumni?retryWrites=true&w=majority&appName=alumni-cluster

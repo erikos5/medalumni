@@ -240,6 +240,7 @@ const AuthState = props => {
 
   // Logout
   const logout = () => {
+    localStorage.clear();
     localStorage.removeItem('adminSession');
     localStorage.removeItem('token');
     localStorage.removeItem('user');

@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: mediterranean-alumni-api
+    env: node
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_URI
+        sync: false # You'll need to set this in Render dashboard
+      - key: JWT_SECRET
+        sync: false # You'll need to set this in Render dashboard
+      - key: FRONTEND_URL
+        value: https://mediterranean-alumni.netlify.app 
