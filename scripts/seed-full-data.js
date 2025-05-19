@@ -208,12 +208,9 @@ const createHashedPassword = async (password) => {
 const seedUsers = async () => {
   console.log('\nSeeding users...');
   
-  // Check if users already exist
-  const existingUsers = await User.countDocuments();
-  if (existingUsers > 0) {
-    console.log(`  - ${existingUsers} users already exist in the database`);
-    return await User.find();
-  }
+  // Delete all existing users to ensure a fresh set
+  await User.deleteMany({});
+  console.log('  - Cleared existing users');
   
   const defaultPassword = await createHashedPassword('password123');
   
@@ -275,12 +272,9 @@ const seedUsers = async () => {
 const seedSchools = async () => {
   console.log('\nSeeding schools...');
   
-  // Check if schools already exist
-  const existingSchools = await School.countDocuments();
-  if (existingSchools > 0) {
-    console.log(`  - ${existingSchools} schools already exist in the database`);
-    return await School.find();
-  }
+  // Delete all existing schools to ensure a fresh set
+  await School.deleteMany({});
+  console.log('  - Cleared existing schools');
   
   const schools = [
     {
@@ -330,12 +324,9 @@ const seedSchools = async () => {
 const seedProfiles = async (users, schools) => {
   console.log('\nSeeding profiles...');
   
-  // Check if profiles already exist
-  const existingProfiles = await Profile.countDocuments();
-  if (existingProfiles > 0) {
-    console.log(`  - ${existingProfiles} profiles already exist in the database`);
-    return await Profile.find();
-  }
+  // Delete all existing profiles to ensure a fresh set
+  await Profile.deleteMany({});
+  console.log('  - Cleared existing profiles');
   
   // Skip admin user (first in the array) when creating profiles
   const nonAdminUsers = users.filter(user => user.role !== 'admin');
@@ -451,12 +442,9 @@ const seedProfiles = async (users, schools) => {
 const seedEvents = async (adminUser) => {
   console.log('\nSeeding events...');
   
-  // Check if events already exist
-  const existingEvents = await Event.countDocuments();
-  if (existingEvents > 0) {
-    console.log(`  - ${existingEvents} events already exist in the database`);
-    return await Event.find();
-  }
+  // Delete all existing events to ensure a fresh set
+  await Event.deleteMany({});
+  console.log('  - Cleared existing events');
   
   // Create dates for events (future dates)
   const today = new Date();
